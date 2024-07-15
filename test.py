@@ -1,87 +1,87 @@
-import random
 import socket
 import threading
 import time
 
-from constants import *
+from constants import DELETE_DATA, DELETE_QUERY, INSERT_DATA, INSERT_QUERY
+from utils import connect_db, generate_hex
 
-def random_hex():
-    return '{:02x}'.format(random.randint(0, 255))
-
-def generate_hex(count):
-    str_hex="FE"
-    for i in range(count-2):
-        str_hex+=random_hex()
-    return str_hex+"FF"
-
-class SetTopBox:
-    def __init__(self, host, port, local_port=None):
+class SetTopBoxServer:
+    def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.local_port = local_port
-        self.socket = None
-        self.connect()
+        self.server_socket = None
+        self.client_socket = None
+        self.conn = connect_db()
+        self.start_server()
 
-    def connect(self):
+    def start_server(self):
         try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            if self.local_port:
-                self.socket.bind(('0.0.0.0', self.local_port))  # 로컬 포트를 바인딩
-            self.socket.connect((self.host, self.port))
-            print(f"Connected to {self.host}:{self.port}")
-            threading.Thread(target=self.receive_messages, daemon=True).start()
-            threading.Thread(target=self.send_status, daemon=True).start()
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server_socket.bind((self.host, self.port))
+            self.server_socket.listen(1)
+            print(f"Listening on {self.host}:{self.port}")
+            insert_sync(self.conn)
+            self.accept_client()
         except Exception as e:
-            print(f"Failed to connect: {e}")
-            time.sleep(5)
-            self.connect()
+            print(f"Failed to start server: {e}")
+            self.stop_server()
 
-    def send_message(self, message):
-        try:
-            self.socket.sendall(message.encode('utf-8'))
-            print(f"Sent: {message}")
-        except Exception as e:
-            print(f"Failed to send message: {e}")
-            self.disconnect()
+    def accept_client(self):
+        while True:
+            try:
+                self.client_socket, addr = self.server_socket.accept()
+                print(f"Connection from {addr}")
+                self.client_socket.sendall("CONNECT".encode('utf-8'))
+                threading.Thread(target=self.receive_messages, daemon=True).start()
+                break
+            except Exception as e:
+                print(f"Error accepting client: {e}")
 
     def receive_messages(self):
         while True:
             try:
-                response = self.socket.recv(1024)
+                response = self.client_socket.recv(1024)
                 if response:
                     print(f"Received: {response.decode('utf-8')}")
                 else:
-                    self.disconnect()
+                    self.disconnect_client()
                     break
             except Exception as e:
                 print(f"Error receiving message: {e}")
-                self.disconnect()
+                self.disconnect_client()
                 break
 
-    def disconnect(self):
-        print("Disconnected from server.")
-        self.socket.close()
-        self.connect()
+    def disconnect_client(self):
+        print("Client disconnected.")
+        if self.client_socket:
+            self.client_socket.close()
+        self.client_socket = None
+        self.accept_client()
 
-    def close(self):
-        self.socket.close()
+    def stop_server(self):
+        if self.server_socket:
+            self.server_socket.close()
+        delete_sync(self.conn)
+        print("Server stopped.")
+    
+    def send_message(self, message):
+        try:
+            self.server_socket.sendall(message.encode('utf-8'))
+            print(f"Sent: {message}")
+        except Exception as e:
+            print(f"Failed to send message: {e}")
+            self.disconnect()
 
     def send_status(self):
         while True:
             self.send_message(generate_hex(32))
             time.sleep(10)
 
-    def request_time_data(self):
-        self.send_message("FE093333333300FF")
-
-    def send_ping_addr(self):
-        self.send_message(generate_hex(32))
-
 if __name__ == "__main__":
-    client = SetTopBox(HOST, SERVER_PORT, LOCAL_PORT)
+    server = SetTopBoxServer("192.168.0.8", 43001)
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        client.close()
-        print("Client closed")
+        server.stop_server()
+        print("Server stopped by user.")
