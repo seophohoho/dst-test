@@ -2,6 +2,8 @@ import random
 import mariadb
 import sys
 
+from constants import DB_HOST, DB_NAME, DB_PORT, DB_PW, DB_USER
+
 def random_hex():
     return '{:02x}'.format(random.randint(0, 255))
 
@@ -14,11 +16,11 @@ def generate_hex(count):
 def connect_db():
     try:
         conn = mariadb.connect(
-            host="localhost",
-            port=3306,
-            user="root",
-            password="root",
-            db="joaelec"
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=DB_PW,
+            db=DB_NAME
         )
         return conn
     except mariadb.Error as e:
