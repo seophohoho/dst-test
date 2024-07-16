@@ -48,7 +48,7 @@ class JoaelectClient1:
     def receive_messages(self):
         while True:
             try:
-                response = self.client_socket.recv(1024)
+                response = self.client_socket.recv(2048)
                 if response:
                     addr = response.decode('utf-8').split('|')[0]   #상대편 측 주소
                     msg = response.decode('utf-8').split('|')[1]    #상대편 측 메시지
