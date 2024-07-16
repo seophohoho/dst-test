@@ -52,8 +52,8 @@ class JoaelectClient1:
                 if response:
                     addr = response.decode('utf-8').split('|')[0]   #상대편 측 주소
                     msg = response.decode('utf-8').split('|')[1]    #상대편 측 메시지
-                    cmd = msg[2:4]                                  #상대편 메시지의 커맨드
-                    print("Receive: "+msg+self.judge_cmd(cmd))
+                                                      #상대편 메시지의 커맨드
+                    print("Receive: "+msg+self.judge_cmd(msg))
                 else:
                     self.disconnect_client()
                     break
@@ -74,12 +74,23 @@ class JoaelectClient1:
             self.send_message(generate_hex(32))
             time.sleep(10)
 
-    def judge_cmd(self,cmd):
-        if cmd == "04":
+    def judge_cmd(self,msg):
+        cmd = msg[2:4]
+        if cmd == "01":
+            led,output,relay,fan = msg[4:6],msg[6:8],msg[8:10],msg[10:12]
+            return f"(Received a BoardControll request from the server),led={led}|output={output}|relay={relay}|fan={fan}"
+        elif cmd == "02":
+            camera_power,camera_reset,camera_automanual=msg[4:6],msg[6:8],msg[8:10]
+            return f"(Received a CameraPowerControll request from the server),PO={camera_power}|PR={camera_reset}|AM={camera_automanual}"
+        elif cmd == "03":
+            return f"(Received a KeyController request from the server)"
+        elif cmd == "04":
             return "(Received a TimeSync request from the server.)"
+        elif cmd == "05":
+            return "(Received a StatusResponse request from the server)"
         elif cmd == "21":
             self.send_ping()
-            return "(Received a Ping request from the server.)"
+            return "(Received a CamearaPing request from the server.)"
             
     def send_ping(self):
         self.send_message(generate_hex(32))

@@ -1,5 +1,5 @@
 HOST="192.168.0.8" #Your Ip.
-SERVER_PORT=43001  #Your Port.
+SERVER_PORT=54321  #Your Port.
 LOCAL_PORT = 54321
 DEVICE_ID = '999001'
 
@@ -52,7 +52,7 @@ INSERT_DATA = (
     'N',                #LEDAUTOYN,LED 자동점등기능 사용유무
     '190000',           #LEDSTARTTIME,LED점등시간
     '070000',           #LEDENDTIME,LED소등시간
-    'Y',                #TEMPAUTOYN,FAN자동설정
+    'N',                #TEMPAUTOYN,FAN자동설정
     '25',               #TEMPMINNUM,FAN동작 최저온도(중지)
     '28',               #TEMPMAXNUM,FAN작동온도
     'admin',            #ADDID,등록자 아이디
@@ -62,7 +62,7 @@ INSERT_DATA = (
     '20240701',         #CHANGEDATE,수정일 (YYYYMMDD)
     '160247',           #CHANGETIME,수정시간 (24HHMISS)
     'Y',                #DEVICEUSE,관리유무
-    'WAIT'              #DEVICESTATUS,장비접속유무
+    'USE'              #DEVICESTATUS,장비접속유무
     )
 
 DELETE_QUERY = '''
