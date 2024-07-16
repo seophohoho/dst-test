@@ -63,10 +63,10 @@ class JoaelectClient1:
 
     def judge_cmd(self, cmd):
         if cmd == "04":
-            return "(시간 동기화 요청 받음.)"
+            return "(Received a TimeSync request from the server.)"
         elif cmd == "21":
             self.send_ping()
-            return "(핑 요청 받음.)"
+            return "(Received a Ping request from the server)"
 
     def send_ping(self):
         self.send_message(generate_hex(32))
