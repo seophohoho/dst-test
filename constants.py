@@ -44,7 +44,7 @@ INSERT_DATA = (
     '002',              #PROTOCOLTYPE,통신타입
     '9999-001',         #DEVICENUMBER,장비모델번호
     HOST,               #DEVICEMNGIPADDR,장비관리IP
-    str(LOCAL_PORT),    #DEVICEMNGPORT,장비관리포트
+    str(SERVER_PORT),   #DEVICEMNGPORT,장비관리포트
     'Y',                #PINGYN,카메라주소요청사용유무
     10,                 #PINGNUM,카메라 PING주기
     'Y',                #TIMESYNCAUTO,시간 정보 전송 사용유무
@@ -52,7 +52,7 @@ INSERT_DATA = (
     'N',                #LEDAUTOYN,LED 자동점등기능 사용유무
     '190000',           #LEDSTARTTIME,LED점등시간
     '070000',           #LEDENDTIME,LED소등시간
-    'N',                #TEMPAUTOYN,FAN자동설정
+    'Y',                #TEMPAUTOYN,FAN자동설정
     '25',               #TEMPMINNUM,FAN동작 최저온도(중지)
     '28',               #TEMPMAXNUM,FAN작동온도
     'admin',            #ADDID,등록자 아이디
