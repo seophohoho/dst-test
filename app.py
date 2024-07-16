@@ -32,7 +32,6 @@ class JoaelectClient1:
             try:
                 self.client_socket, addr = self.server_socket.accept()
                 print(f"Connection from {addr}")
-                print(self.client_socket,addr)
                 #self.client_socket.sendall("CONNECT".encode('utf-8'))
                 threading.Thread(target=self.receive_messages, daemon=True).start()
                 threading.Thread(target=self.send_status, daemon=True).start()
@@ -64,7 +63,6 @@ class JoaelectClient1:
                 break
     def send_message(self, message):
         try:
-            print(self.client_socket)
             self.client_socket.sendall(message.encode('utf-8'))
             print(f"Send: {message}")
         except Exception as e:
