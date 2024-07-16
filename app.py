@@ -83,6 +83,12 @@ class JoaelectClient1:
             
     def send_ping(self):
         self.send_message(generate_hex(32))
+    
+    def disconnect_client(self):
+        if self.client_socket:
+            self.client_socket.close()
+            self.client_socket = None
+            print("Client disconnected.")
 
 
 
